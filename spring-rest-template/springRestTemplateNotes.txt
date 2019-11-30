@@ -1,0 +1,18 @@
+Spring RestTemplate:
+
+Spring RestTemplate class is part of spring-web, introduced in Spring 3.
+We can use RestTemplate to test HTTP based restful web services, it doesn’t support HTTPS protocol.
+RestTemplate class provides overloaded methods for different HTTP methods, such as GET, POST, PUT, DELETE etc.
+
+Jar Dependencies:
+We need spring-core, spring-context dependencies for spring framework. 
+Then we need spring-web artifact that contains RestTemplate class. 
+We also need jackson-mapper-asl for Spring JSON support through Jackson API.
+
+Beans:
+We have to define a spring bean for RestTemplate class, that’s done in AppConfig class.
+Note that RestTemplate uses MessageConverter and we need to set this property in the RestTemplate bean. 
+We are using MappingJacksonHttpMessageConverter for fetching data from JSON format.
+
+Final step is to create the client classes that will use RestTemplate bean defined above.
+Inside Client methods, we call RestTemplate methods based on the URI and the HTTP method and by passing appropriate request object if needed.

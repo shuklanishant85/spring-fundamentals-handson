@@ -1,0 +1,25 @@
+Spring Bean Life Cycle:
+
+By implementing InitializingBean and DisposableBean interfaces – Both these interfaces declare a single method where we can initialize/close resources in the bean. For post-initialization, we can implement InitializingBean interface and provide implementation of afterPropertiesSet() method. For pre-destroy, we can implement DisposableBean interface and provide implementation of destroy() method. These methods are the callback methods and similar to servlet listener implementations. This approach is simple to use but it’s not recommended because it will create tight coupling with the Spring framework in our bean implementations.
+
+Providing init-method and destroy-method attribute values for the bean in the spring bean configuration file. This is the recommended approach because of no direct dependency to spring framework and we can create our own methods.
+
+Spring framework also support @PostConstruct and @PreDestroy annotations for defining post-init and pre-destroy methods. These annotations are part of javax.annotation package. However for these annotations to work, we need to configure our spring application to look for annotations. We can do this either by defining bean of type org.springframework.context.annotation.CommonAnnotationBeanPostProcessor or by context:annotation-config element in spring bean configuration file.
+
+life cycle:
+-> Spring Context is first using no-args constructor to initialize the bean object and then calling the post-init method.
+-> The order of bean initialization is same as it’s defined in the spring bean configuration file.
+-> The context is returned only when all the spring beans are initialized properly with post-init method executions.
+-> When context is getting closed, beans are destroyed in the reverse order in which they were initialized i.e in LIFO (Last-In-First-Out) order.
+
+Spring Aware Interfaces
+Sometimes we need Spring Framework objects in our beans to perform some operations, for example reading ServletConfig and ServletContext parameters or to know the bean definitions loaded by the ApplicationContext.
+org.springframework.beans.factory.Aware is the root marker interface for all these Aware interfaces. All of the *Aware interfaces are sub-interfaces of Aware and declare a single setter method to be implemented by the bean. Then spring context uses setter-based dependency injection to inject the corresponding objects in the bean and make it available for our use.
+Spring Aware interfaces are similar to servlet listeners with callback methods and implementing observer design pattern.
+
+ApplicationContextAware – to inject ApplicationContext object, example usage is to get the array of bean definition names.
+BeanFactoryAware – to inject BeanFactory object, example usage is to check scope of a bean.
+BeanNameAware – to know the bean name defined in the configuration file.
+ResourceLoaderAware – to inject ResourceLoader object, example usage is to get the input stream for a file in the classpath.
+ServletContextAware – to inject ServletContext object in MVC application, example usage is to read context parameters and attributes.
+ServletConfigAware – to inject ServletConfig object in MVC application, example usage is to get servlet config parameters.

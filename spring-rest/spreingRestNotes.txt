@@ -1,0 +1,65 @@
+Spring Restful Web Services Example with JSON, Jackson and Client Program:
+
+In servlet-context.xml, plugging in MappingJackson2HttpMessageConverter to the RequestMappingHandlerAdapter messageConverters starts Jackson API and converts JSON to Java Beans and vice versa. By having this configuration, we will be using JSON in request body and we will receive JSON data in the response.
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------
+	<!-- Configure to plugin JSON as request and response in method handler -->
+	<beans:bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter">
+		<beans:property name="messageConverters">
+			<beans:list>
+				<beans:ref bean="jsonMessageConverter"/>
+			</beans:list>
+		</beans:property>
+	</beans:bean>
+	
+	<!-- Configure bean to convert JSON to POJO and vice versa -->
+	<beans:bean id="jsonMessageConverter" class="org.springframework.http.converter.json.MappingJacksonHttpMessageConverter"/>
+-------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+A simple POJO class (Employee.class) serves as input and output to our Restful web service methods.
+We use @JsonSerialize annotation to use DateSerializer class for Date conversion from Java type to JSON format and vice versa.
+We have a class defining all these URI as String constants.
+
+We will have following rest web services end points:
+----------------------------------------------------------------------------------------------------------------------------                                         
+SL. | URI					|HTTP METHOD  	|  DETAILS                                                                     |
+1	| /rest/emp/dummy		|  GET			|  Health Check service, to insert a dummy data in the Employees data storage  |
+2	| /rest/emp/{id}		|  GET			|  To get the Employee object based on the id                                  |
+3	| /rest/emps			|  GET			|  To get the list of all the Employees in the data store                      |
+4	| /rest/emp/create		|  POST			|  To create the Employee object and store it                                  |
+5	| /rest/emp/delete/{id}	|  PUT			|  To delete the Employee object from the data storage based on the id         |
+----------------------------------------------------------------------------------------------------------------------------
+
+Our EmployeeController class will publish all the web service end points mentioned above.
+
+@RequestMapping annotation is used to map the request URI to the handler method. We can also specify the HTTP method that should be used by client application to invoke the rest method.
+
+@ResponseBody annotation is used to map the response object in the response body. Once the response object is returned by the handler method, MappingJacksonHttpMessageConverter kicks in and convert it to JSON response.
+
+@PathVariable annotation is the easy way to extract the data from the rest URI and map it to the method argument.
+
+@RequestBody annotation is used to map the request body JSON data into the Employee object, again this is done by the MappingJacksonHttpMessageConverter mapping.
+
+Export the project as WAR file and copy it in the servlet container web app directory. If you have server configured in the eclipse, you can simply run it on the server to get it deployed.
+
+I am using WizTools RestClient to invoke the rest calls but you can also use Chrome extension Postman.
+
+Request Status Codes:
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+Status 400 : The request sent by the client was syntactically incorrect.
+Status 404 : The requested resource is not available.
+Status 405 : Method Not Allowed
+Status 501 : bad request
+Status 415 : The server refused this request because the request entity is in a format not supported by the requested resource for the requested method.
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Spring Rest Client Program:
+
+Rest Clients are good to test our rest web service but most of the times, we need to invoke rest services through our program. We can use Spring RestTemplate to invoke these methods easily.
+
+When invoking rest method returning a Collection, we need to use LinkedHashMap because JSON to object conversion doesn’t know about the Employee object and converts it to the collection of LinkedHashMap. We can write a utility method to convert from LinkedHashMap to our Java Bean object.
+In RestTemplate, we can't get List<Employee> because JSON convertor doesn't know the type of object in the list and hence convert it to default JSON object type LinkedHashMap.
+		List<LinkedHashMap> emps = restTemplate.getForObject(SERVER_URI+EmpRestURIConstants.GET_ALL_EMP, List.class);
+
+Another point is that RestTemplate put methods doesn’t have option to set response object because PUT method should be used to store something on the server and a simple HTTP 200 status code should be sufficient.
+

@@ -1,0 +1,26 @@
+Spring REST XML and JSON Tutorials:
+
+Define a bean of type Jaxb2RootElementHttpMessageConverter:
+<beans:bean id="xmlMessageConverter" class="org.springframework.http.converter.xml.Jaxb2RootElementHttpMessageConverter"/>
+
+Add above configured bean to RequestMappingHandlerAdapter property messageConverters:
+
+<beans:bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter">
+<beans:property name="messageConverters">
+	<beans:list>
+		<beans:ref bean="jsonMessageConverter"/>
+		<beans:ref bean="xmlMessageConverter"/>
+	</beans:list>
+</beans:property>
+</beans:bean>
+
+
+For working with JAXB marshalling (object to tree/xml conversion) for a class, we need to annotate it with @XmlRootElement annotation. So add this to our Employee model class.
+
+Our Spring application will support both JSON as well as XML. It will even support XML request with JSON response and vice versa.
+
+NOTE: In postman calls: 
+ XML Response: Make sure you pass Accept header as “application/xml”.
+ JSON Response: Make sure you pass Accept header as “application/json”.
+ XML Request with JSON Response: Make sure Accept header is “application/json” and Content-Type header is “text/xml”.
+ 
